@@ -1,8 +1,12 @@
 'use client'
 
+//IMPORTS
+
 import Image from 'next/image'
 import styles from './page.module.css'
 import { useState } from 'react'
+
+//INTERFACES
 
 interface Deck {
 	player: string;
@@ -16,24 +20,29 @@ interface Deck {
 	power: number;
 };
 
-function PlayerSelect({playerPool, handlePlayerSelect}){
-	return (
-		<div className="checkList">
-			<div className="list-container">
-				{playerPool.map((player, index) => (
-					<div key={index}>
-						<input value={player} type="checkbox" onChange={handlePlayerSelect}/>
-						<span>{player}</span>
-					</div>
-				))}
-			</div>
-		</div>
-	);
+interface PlayerIndexedDeckList {
+	[key: string]: Array<Deck>;
 }
 
-export default function Home() {
+//BASE COMPONENT
 
+export default function Home() {
+	return (
+		<main className={styles.main}>
+		  <MatchupGenerator />
+		</main>
+	)
+}
+
+//COMPONENTS LARGE TO SMALL
+
+function MatchupGenerator() {
+
+	const [step, setStep] = useState(0);
 	const [selectedPlayers, setSelectedPlayers] = useState([]);
+	const [selectedDecks, setSelectedDecks] = useState([]);
+	
+	const maxStep = 1;
 
 	let decka1: Deck = {player: "Andrew", commander: "Bahamut", w:true, u: false, b: false, r: false, g: false, strategy:["Initiative", "Tokens", "Superfriends"], power: 5};
 	let decka2: Deck = {player: "Andrew", commander: "Sidar & Ikra", w:true, u: false, b: true, r: false, g: true, strategy:["Lifegain"], power: 7};
@@ -66,35 +75,35 @@ export default function Home() {
 	let deckm2: Deck = {player: "Mark", commander: "Kresh", w:false, u: true, b: true, r: true, g: true, strategy:["Voltron", "Plus One Counters"], power: 5};
 
 	let fullDeckList: Array<Deck> = [
-	decka1,
-	decka2,
-	//decka3,
-	//decka4,
-	//decka5,
-	//decka6,
-	decka7,
-	//deckb1,
-	//deckb2,
-	//deckb3,
-	//deckb4,
-	//deckb5,
-	//deckb6,
-	//deckb7,
-	//deckb8,
-	//deckb9,
-	//decks1,
-	//decks2,
-	decks3,
-	//decks4,
-	//decks5,
-	decks6,
-	//decko1,
-	//decko2,
-	//decko3,
-	//decko4,
-	decko5,
-	//deckm1,
-	//deckm2	
+		decka1,
+		decka2,
+		decka3,
+		decka4,
+		decka5,
+		decka6,
+		decka7,
+		deckb1,
+		deckb2,
+		deckb3,
+		deckb4,
+		deckb5,
+		deckb6,
+		deckb7,
+		deckb8,
+		deckb9,
+		decks1,
+		decks2,
+		decks3,
+		decks4,
+		decks5,
+		decks6,
+		decko1,
+		decko2,
+		decko3,
+		decko4,
+		decko5,
+		deckm1,
+		deckm2	
 	];
 
 	let playerPool = [...new Set(fullDeckList.map(deck => deck.player))];
@@ -110,17 +119,97 @@ export default function Home() {
 		setSelectedPlayers(updatedPlayerList);
 	};
 
+	const conditionalComponent = () => {
+		switch(step) {
+			case 0: 
+				return <ChoosePlayersStep playerPool={playerPool} handlePlayerSelect={handlePlayerSelect}/>;
+			case 1:
+				return <ChooseDecksStep selectedPlayers={selectedPlayers}/>;
+			default:
+				console.log("ERROR - STEP OUT OF BOUNDS");
+				return <ChoosePlayersStep />;
+		}
+	};
+	
+	const nextDisabled = () => {
+		switch(step){
+			case 0:
+				return selectedPlayers.length < 2;
+			case 1:
+				return true;
+			default:
+				console.log("ERROR: STEP OUT OF BOUNDS");
+				return true;
+		}
+	}
+	
+	const handleNext = () => {
+		if(step < maxStep){
+			setStep(step + 1);
+		} else {
+			setStep(0);
+		}
+	};
+	
+	const nextButtonText = () => {
+		switch(step){
+			case 0:
+				return "Next";
+			case 1: 
+				return "Submit";
+			case 2:
+				return "Start Over";
+		}
+	}
+	
+	const handleBack = () => {
+		if(step > 0){
+			setStep(step - 1);
+		} else {
+			setStep(0);
+		}
+	};
+	
+	
 	return (
-		<main className={styles.main}>
-		  <div /*style for first frame*/>
-			<h2>Select Players</h2>
-			<PlayerSelect playerPool={playerPool} handlePlayerSelect={handlePlayerSelect} />
-			<div>
-			{selectedPlayers.map((player, index) => (
-				<div>{player}</div>
-			))}
+		<div /*style for first frame*/>
+			{conditionalComponent()}
+			{step > 0 && <button onClick={handleBack}>Back</button>}
+			<button disabled={nextDisabled()} onClick={handleNext} /*style for button*/ >{nextButtonText()}</button>
+		</div>
+	);
+};
+
+function ChoosePlayersStep({playerPool, handlePlayerSelect}){
+	return (
+	<>
+		<h2>Who's Playing?</h2>
+		<PlayerSelect playerPool={playerPool} handlePlayerSelect={handlePlayerSelect} />
+	</> );
+}
+
+function PlayerSelect({playerPool, handlePlayerSelect}){
+	return (
+		<div className="checkList">
+			<div className="list-container">
+				{playerPool.map((player, index) => (
+					<div key={index}>
+						<input value={player} type="checkbox" onChange={handlePlayerSelect}/>
+						<span>{player}</span>
+					</div>
+				))}
 			</div>
-		  </div>
-		</main>
-	)
+		</div>
+	);
+}
+
+function ChooseDecksStep({selectedPlayers}){
+	return (
+		<>
+			<h2>Choose Decks</h2>
+			{selectedPlayers.map((item, index) => (
+				<div key={index}>{item}</div>
+			))}
+		</> 
+	);
 }
