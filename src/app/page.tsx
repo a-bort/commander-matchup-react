@@ -24,6 +24,119 @@ interface PlayerIndexedDeckList {
 	[key: string]: Array<Deck>;
 }
 
+//CLASSES
+
+class Matchup {
+	matchupDecks: Array<Deck> = [];
+	matchupName: string = "";
+	colorCoverage: string = "";
+	powerVariance: number = 0;
+	strategyOverlap: number = 0;
+	
+	constructor(decks: Array<Deck>) {
+		this.matchupDecks = decks;
+		this.generateMatchupName();
+		this.generateColorCoverage();
+		this.generatePowerVariance();
+		this.generateStrategyOverlap();
+	}
+	
+	generateMatchupName() {
+		if(this.matchupDecks.length == 0){return;}
+		var name = this.matchupDecks[0].commander;
+		for(var i = 1; i < this.matchupDecks.length; i++){
+			name = `${name} vs. ${this.matchupDecks[i].commander}`;
+		}
+		this.matchupName = name;
+	}
+	
+	generateColorCoverage() {
+		let w: boolean = false;
+		let u: boolean = false;
+		let b: boolean = false;
+		let r: boolean = false;
+		let g: boolean = false;
+		for(var i = 0; i < this.matchupDecks.length; i++){
+			w = w || this.matchupDecks[i].w;
+			u = u || this.matchupDecks[i].u;
+			b = b || this.matchupDecks[i].b;
+			r = r || this.matchupDecks[i].r;
+			g = g || this.matchupDecks[i].g;
+		}
+		this.colorCoverage = (w ? "W" : "").concat(u ? "U" : "", b ? "B" : "", r ? "R" : "", g ? "G" : "");
+	}
+	
+	generatePowerVariance() {
+		let powers: Array<number> = [];
+		for(var i = 0; i < this.matchupDecks.length; i++){
+			powers.push(this.matchupDecks[i].power);
+		}
+		this.powerVariance = calculateSD(calculateVariance(powers));
+	}
+	
+	generateStrategyOverlap() {
+		let overlap: number = 0;
+		for(var i = 0; i < this.matchupDecks.length - 1; i++){
+			for(var j = i+1; j < this.matchupDecks.length; j++){
+				overlap += commonArrayElements(this.matchupDecks[i].strategy, this.matchupDecks[j].strategy);
+			}
+		}
+		this.strategyOverlap = overlap;
+	}
+}
+
+/********************
+*
+* UTILITY FUNCTIONS
+*
+***********************/
+
+const cartesian = (set_a: Array<Array<Deck>>, set_b: Array<Deck>): Array<Array<Deck>> => {
+	let result: Array<Array<Deck>> = [];
+	for(var i=0; i<set_a.length; i++){
+		for(var j=0; j<set_b.length; j++){
+			let temp: Array<Deck> = set_a[i].concat(set_b[j]);
+			result.push(temp);
+		}
+	}
+	return result;
+}
+
+const calculateMean = (values: number[]): number => {
+  const mean = (values.reduce((sum, current) => sum + current)) / values.length;
+  return mean;
+}
+
+// Calculate variance
+const calculateVariance = (values: number[]): number => {
+  const average = calculateMean(values);
+  const squareDiffs = values.map((value: number): number => {
+	const diff = value - average;
+	return diff * diff;
+  })
+
+  const variance = calculateMean(squareDiffs);
+  return variance;
+}
+
+// Calculate stand deviation
+const calculateSD = (variance: number): number => {
+  return  Math.sqrt(variance);
+}
+
+const commonArrayElements = (arr_1: Array<string>, arr_2: Array<string>): number => {
+	let count = 0;
+	for(var i = 0; i < arr_1.length; i++){
+		for(var j = 0; j < arr_2.length; j++){
+			if(arr_1[i] == arr_2[j]){
+				count++;
+			}
+		}
+	}
+	return count;
+}
+
+
 //BASE COMPONENT
 
 export default function Home() {
@@ -38,12 +151,15 @@ export default function Home() {
 
 function MatchupGenerator() {
 
-	const [step, setStep] = useState(0);
-	const [selectedPlayers, setSelectedPlayers] = useState([]);
-	const [selectedDecks, setSelectedDecks] = useState([]);
+	// ************ STATE ******************
+	const [step, setStep] = useState(0); //DEFUNCT?
+	const [selectedPlayerDeckLists, setSelectedPlayerDeckLists] = useState({}); //key: playerName | value: chosenDecks
+	const [submitEnabled, setSubmitEnabled] = useState(false);
+	const [matchups, setMatchups] = useState([]); //List of Matchup objects
 	
-	const maxStep = 1;
+	const maxStep = 2;
 
+	// ************ REPLACE WITH DATABASE 
 	let decka1: Deck = {player: "Andrew", commander: "Bahamut", w:true, u: false, b: false, r: false, g: false, strategy:["Initiative", "Tokens", "Superfriends"], power: 5};
 	let decka2: Deck = {player: "Andrew", commander: "Sidar & Ikra", w:true, u: false, b: true, r: false, g: true, strategy:["Lifegain"], power: 7};
 	let decka3: Deck = {player: "Andrew", commander: "Chromium", w:true, u: true, b: true, r: false, g: false, strategy:["Control", "Self Discard"], power: 5};
@@ -105,26 +221,53 @@ function MatchupGenerator() {
 		deckm1,
 		deckm2	
 	];
+	
+	// **************** DATA MANIPULATION
+	
+	let deckListByPlayer: PlayerIndexedDeckList = {};
+
+	for(var i = 0; i < fullDeckList.length; i++){
+		var deck = fullDeckList[i];
+		if(!deckListByPlayer[deck.player]){
+			deckListByPlayer[deck.player] = new Array<Deck>();
+		}
+		deckListByPlayer[deck.player].push(deck);
+	}
 
 	let playerPool = [...new Set(fullDeckList.map(deck => deck.player))];
-	//console.log(playerPool);
 	
 	const handlePlayerSelect = (event) => {
-		var updatedPlayerList = [...selectedPlayers];
+		var updatedSelectedPlayerDeckLists = {...selectedPlayerDeckLists};
 		if(event.target.checked){
-			updatedPlayerList = [...selectedPlayers, event.target.value];
+			updatedSelectedPlayerDeckLists[event.target.value] = deckListByPlayer[event.target.value];
 		} else {
-			updatedPlayerList.splice(updatedPlayerList.indexOf(event.target.value), 1);
+			delete updatedSelectedPlayerDeckLists[event.target.value];
 		}
-		setSelectedPlayers(updatedPlayerList);
+		setSelectedPlayerDeckLists(updatedSelectedPlayerDeckLists);
 	};
+	
+	const handleDeckSelect = (event) => {
+		let player = event.target.getAttribute("pname");
+		let deckIndex = event.target.value;
+		
+		var updatedSelectedPlayerDeckLists = {...selectedPlayerDeckLists};
+		
+		updatedSelectedPlayerDeckLists[player][deckIndex].selected = event.target.checked;
+		setSelectedPlayerDeckLists(updatedSelectedPlayerDeckLists);
+		console.log(selectedPlayerDeckLists);
+	}
 
+	/********
+	*  DEFUNCT DISPLAY FOR PAGED VERSION
+	
 	const conditionalComponent = () => {
 		switch(step) {
 			case 0: 
 				return <ChoosePlayersStep playerPool={playerPool} handlePlayerSelect={handlePlayerSelect}/>;
 			case 1:
-				return <ChooseDecksStep selectedPlayers={selectedPlayers}/>;
+				return <ChooseDecksStep selectedPlayerDeckLists={selectedPlayerDeckLists} handleDeckSelect={handleDeckSelect}/>;
+			case 2:
+				return <MatchupList />;
 			default:
 				console.log("ERROR - STEP OUT OF BOUNDS");
 				return <ChoosePlayersStep />;
@@ -134,33 +277,86 @@ function MatchupGenerator() {
 	const nextDisabled = () => {
 		switch(step){
 			case 0:
-				return selectedPlayers.length < 2;
+				return Object.keys(selectedPlayerDeckLists).length < 2;
 			case 1:
-				return true;
+				return !readyToGenerate();
+			case 2:
+				return false;
 			default:
 				console.log("ERROR: STEP OUT OF BOUNDS");
 				return true;
 		}
 	}
 	
-	const handleNext = () => {
-		if(step < maxStep){
-			setStep(step + 1);
-		} else {
-			setStep(0);
+	*
+	*********************/
+	
+	const readyToGenerate = () => {
+		var players = Object.keys(selectedPlayerDeckLists);
+		if(players.length < 2){ return false; }
+		else {
+			for (var i = 0; i < players.length; i++){
+				var player = players[i];
+				var found = false;
+				for(var j = 0; j < selectedPlayerDeckLists[player].length; j++){
+					if(selectedPlayerDeckLists[player][j].selected){
+						found = true;
+						break;
+					}
+				}
+				if(!found){
+					return false;
+				}
+			}
 		}
+		return true;
+	}
+	
+	const submitDisabled = () => {
+		return !readyToGenerate();
 	};
 	
-	const nextButtonText = () => {
-		switch(step){
-			case 0:
-				return "Next";
-			case 1: 
-				return "Submit";
-			case 2:
-				return "Start Over";
+	const handleSubmit = () => {
+		let players: Array<string> = Object.keys(selectedPlayerDeckLists);
+		console.log(players);
+		//NEED TO FILTER ONLY SELECTED DECKS
+		let fullLists: Array<Array<Deck>> = Object.values(selectedPlayerDeckLists);
+		let selectedLists: Array<Array<Deck>> = [];
+		
+		for(var i = 0; i < fullLists.length; i++){
+			var selectedList = [];
+			for(var j = 0; j < fullLists[i].length; j++){
+				if(fullLists[i][j].selected){
+					selectedList.push(fullLists[i][j]);
+				}
+			}
+			selectedLists.push(selectedList);
 		}
+		
+		console.log(selectedLists);
+		
+		let deckMatchups: Array<Array<Deck>> = [[]];
+		for(var i = 0; i < selectedLists.length; i++){
+			deckMatchups = cartesian(deckMatchups, selectedLists[i]);
+		}
+		
+		console.log(deckMatchups);
+		let updatedMatchups = [...matchups];
+		console.log(matchups);
+		for(var i = 0; i < deckMatchups.length; i++){
+			updatedMatchups.push(new Matchup(deckMatchups[i]));
+		}
+		setMatchups(updatedMatchups);
+		
+	};
+	
+	const submitText = () => {
+		return "Generate";
 	}
+	
+	/****************
+	*
+	* DEFUNCT NEXT BUTTON FUNCTIONALITY
 	
 	const handleBack = () => {
 		if(step > 0){
@@ -170,15 +366,30 @@ function MatchupGenerator() {
 		}
 	};
 	
+	********************************/
+	
+	/**
+	* BASE COMPONENT
+	**/
 	
 	return (
-		<div /*style for first frame*/>
-			{conditionalComponent()}
-			{step > 0 && <button onClick={handleBack}>Back</button>}
-			<button disabled={nextDisabled()} onClick={handleNext} /*style for button*/ >{nextButtonText()}</button>
+		<div>
+			<ChoosePlayersStep playerPool={playerPool} handlePlayerSelect={handlePlayerSelect}/>
+			<br/><hr/><br/>
+			<ChooseDecksStep selectedPlayerDeckLists={selectedPlayerDeckLists} handleDeckSelect={handleDeckSelect}/>
+			<br/><hr/><br/>
+			<button disabled={submitDisabled()} onClick={handleSubmit} /*style for button*/ >{submitText()}</button>
+			<br/><br />
+			<MatchupList matchups={matchups}  />
 		</div>
 	);
 };
+
+/************
+*
+* CHOOSE players
+*
+************/
 
 function ChoosePlayersStep({playerPool, handlePlayerSelect}){
 	return (
@@ -203,13 +414,67 @@ function PlayerSelect({playerPool, handlePlayerSelect}){
 	);
 }
 
-function ChooseDecksStep({selectedPlayers}){
+/****************
+*
+* CHOOSE DECKS
+*
+*****************/
+
+function ChooseDecksStep({selectedPlayerDeckLists, handleDeckSelect}){
+	let players = Object.keys(selectedPlayerDeckLists);
 	return (
 		<>
 			<h2>Choose Decks</h2>
-			{selectedPlayers.map((item, index) => (
-				<div key={index}>{item}</div>
+			<ul>
+			{players.map((name, index) => (
+				<DeckSelector key={index} playerName={name} decks={selectedPlayerDeckLists[name]} handleDeckSelect={handleDeckSelect} />
 			))}
+			</ul>
 		</> 
 	);
+}
+
+function DeckSelector({playerName, decks, handleDeckSelect}){
+	return (
+	<>
+		<li>
+			<h3>{playerName}</h3>
+			{decks.map((deck, index) => (
+				<div key={index}>
+					<input type="checkbox" value={index} pname={playerName} onChange={handleDeckSelect}/>
+					<span>{deck.commander}</span>
+				</div>
+			))}
+		</li>
+	</>
+	);
+}
+
+/************************
+*
+* RENDER matchups
+*
+*************************/
+
+function MatchupList({matchups}){
+	return (
+		<>
+			<h2>Matchups</h2>
+			<div>
+				{matchups.map((matchup, index) => (
+					<div key={index}>
+						<MatchupListItem matchup={matchup}/>
+					</div>			
+				))}
+			</div>
+		</>
+	);
+}
+
+function MatchupListItem({matchup}){
+	return (
+		<div>
+			<span>{matchup.matchupName}</span>
+		</div>
+	)
 }
