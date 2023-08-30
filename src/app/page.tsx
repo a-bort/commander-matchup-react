@@ -29,6 +29,11 @@ interface PlayerIndexedDeckList {
 class Matchup {
 	matchupDecks: Array<Deck> = [];
 	matchupName: string = "";
+	w: boolean;
+	u: boolean;
+	b: boolean;
+	r: boolean;
+	g: boolean;
 	colorCoverage: string = "";
 	powerVariance: number = 0;
 	strategyOverlap: number = 0;
@@ -63,6 +68,11 @@ class Matchup {
 			r = r || this.matchupDecks[i].r;
 			g = g || this.matchupDecks[i].g;
 		}
+		this.w = w;
+		this.u = u;
+		this.b = b;
+		this.r = r;
+		this.g = g;
 		this.colorCoverage = (w ? "W" : "").concat(u ? "U" : "", b ? "B" : "", r ? "R" : "", g ? "G" : "");
 	}
 	
@@ -507,6 +517,7 @@ function MatchupListItem({matchup}){
 	<div style={{padding: "10px", border:"1px solid", marginBottom: "10px"}}>
 		<div>
 			<span><h3><u>{matchup.matchupName}</u></h3></span>
+			<ManaSet matchup={matchup} />
 		</div>
 		<div>
 			<span><b>Color Coverage</b>: {matchup.colorCoverage}</span>
@@ -516,5 +527,44 @@ function MatchupListItem({matchup}){
 			<span><b>Power variance</b>: {matchup.powerVariance}</span>
 		</div>
 	</div>
+	)
+}
+
+function ManaSet({matchup}){
+	let letters = matchup.colorCoverage.split("");
+	return (
+		<>
+		{letters.map((letter, index) => (
+			<ManaSymbol key={index} letter={letter}/>
+		))}
+		</>
+	)
+}
+
+const getManaSymbolImageUrl = (letter: string) : string => {
+	switch(letter.toUpperCase()){
+		case "W":
+			return "var(--white-mana-image)";
+		case "U":
+			return "var(--blue-mana-image)";
+		case "B":
+			return "var(--black-mana-image)";
+		case "R":
+			return "var(--red-mana-image)";
+		case "G":
+			return "var(--green-mana-image)";
+	}
+	return "var(--colorless-mana-image)";
+}
+
+function ManaSymbol({letter}){
+	let imageUrl = getManaSymbolImageUrl(letter);
+	
+	return(
+		<>
+		<div style={{backgroundImage:imageUrl, width:"var(--mana-symbol-width)", height:"var(--mana-symbol-height)", display: "inline-block", margin: "1px, 1px, -1px, 1px", borderRadius: "500px", boxShadow: "-1px, 1px, 0, rgba(0,0,0,0.85)", textIndent: "-999em", overflow:"hidden", backgroundSize: "100% 100%", backgroundPosition: "top left"}}>
+			{letter}
+		</div>
+		</>
 	)
 }
