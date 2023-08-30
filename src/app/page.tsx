@@ -71,7 +71,7 @@ class Matchup {
 		for(var i = 0; i < this.matchupDecks.length; i++){
 			powers.push(this.matchupDecks[i].power);
 		}
-		this.powerVariance = calculateSD(calculateVariance(powers));
+		this.powerVariance = calculateSD(calculateVariance(powers)).toFixed(2);
 	}
 	
 	generateStrategyOverlap() {
@@ -136,6 +136,30 @@ const commonArrayElements = (arr_1: Array<string>, arr_2: Array<string>): number
 	return count;
 }
 
+const compareColorCoverageThenStratsThenPower = (m1: Matchup, m2: Matchup): number => {
+	//Highest weight to color coverate
+	if(m1.colorCoverage.length > m2.colorCoverage.length){
+		return -1;
+	} else if (m1.colorCoverage.length < m2.colorCoverage.length){
+		return 1;
+	}
+	else {
+		//Second weight to strategy overlap (full coverage isn't hard)
+		if(m1.strategyOverlap > m2.strategyOverlap){
+			return 1;
+		} else if(m1.strategyOverlap < m2.strategyOverlap){
+			return -1;
+		} else {
+			//Third weight to power variance, since it's arbitrary
+			if(m1.powerVariance > m2.powerVariance){
+				return 1;
+			} else if(m1.powerVariance < m2.powerVariance){
+				return -1;
+			}
+			return 0;	
+		}
+	}
+}
 
 //BASE COMPONENT
 
@@ -167,18 +191,20 @@ function MatchupGenerator() {
 	let decka5: Deck = {player: "Andrew", commander: "Narset", w:true, u: true, b: false, r: true, g: false, strategy:["Tokens", "Go Wide", "Reanimator"], power: 7};
 	let decka6: Deck = {player: "Andrew", commander: "Aboshan", w:false, u: true, b: false, r: false, g: false, strategy:["Self Mill", "Tap Untap"], power: 4};
 	let decka7: Deck = {player: "Andrew", commander: "Mishra", w:false, u: true, b: true, r: true, g: false, strategy:["Artifacts"], power: 4};
+	let decka8: Deck = {player: "Andrew", commander: "Mathas", w:true, u: false, b: true, r: true, g: false, strategy:["Punisher"], power: 4};
 	let deckb1: Deck = {player: "Brian", commander: "Meren", w:false, u: false, b: true, r: false, g: true, strategy:["Reanimator"], power: 6};
 	let deckb2: Deck = {player: "Brian", commander: "Perrie", w:true, u: true, b: false, r: false, g: true, strategy:["Counters", "Control"], power: 5};
 	let deckb3: Deck = {player: "Brian", commander: "Konrad", w:false, u: false, b: true, r: false, g: false, strategy:["Drain & Gain", "Self Mill"], power: 7};
 	let deckb4: Deck = {player: "Brian", commander: "Zegana", w:false, u: true, b: false, r: false, g: true, strategy:["Plus One Counters", "Stompy"], power: 5};
 	let deckb5: Deck = {player: "Brian", commander: "Aegar", w:false, u: true, b: false, r: true, g: false, strategy:["Burn"], power: 5};
-	let deckb6: Deck = {player: "Patrick", commander: "Leinore", w:true, u: false, b: false, r: false, g: true, strategy:["Plus One Counters", "Go Wide"], power: 5};
-	let deckb7: Deck = {player: "Patrick", commander: "Anje", w:false, u: false, b: true, r: true, g: false, strategy:["Drain & Gain"], power: 5};
-	let deckb8: Deck = {player: "Patrick", commander: "Marneus", w:true, u: true, b: true, r: false, g: false, strategy:["Tokens", "Go Wide"], power: 5};
-	let deckb9: Deck = {player: "Patrick", commander: "Lucea", w:false, u: true, b: false, r: true, g: true, strategy:["Plus One Counters", "Stompy", "Ramp"], power: 7};
+	let deckb6: Deck = {player: "Brian", commander: "Leinore", w:true, u: false, b: false, r: false, g: true, strategy:["Plus One Counters", "Go Wide"], power: 5};
+	let deckb7: Deck = {player: "Brian", commander: "Anje", w:false, u: false, b: true, r: true, g: false, strategy:["Drain & Gain"], power: 5};
+	let deckb8: Deck = {player: "Brian", commander: "Marneus", w:true, u: true, b: true, r: false, g: false, strategy:["Tokens", "Go Wide"], power: 5};
+	let deckb9: Deck = {player: "Brian", commander: "Lucea", w:false, u: true, b: false, r: true, g: true, strategy:["Plus One Counters", "Stompy", "Ramp"], power: 7};
+	let deckb10: Deck = {player: "Brian", commander: "Firja", w:true, u: false, b: true, r: false, g: false, strategy:["Lifegain", "Flyers"], power: 4};
 	let decks1: Deck = {player: "Stamm", commander: "Mazzy", w:true, u: false, b: false, r: true, g: true, strategy:["Enchantress"], power: 7};
 	let decks2: Deck = {player: "Stamm", commander: "Alexi", w:false, u: true, b: false, r: false, g: false, strategy:["Control"], power: 4};
-	let decks3: Deck = {player: "Stamm", commander: "Koll", w:true, u: false, b: false, r: true, g: false, strategy:["Equipment"], power: 4};
+	let decks3: Deck = {player: "Stamm", commander: "Koll", w:true, u: false, b: false, r: true, g: false, strategy:["Equipment"], power: 5};
 	let decks4: Deck = {player: "Stamm", commander: "Magar", w:false, u: false, b: true, r: true, g: false, strategy:["Spell Recursion"], power: 5};
 	let decks5: Deck = {player: "Stamm", commander: "Myra", w:false, u: true, b: false, r: true, g: false, strategy:["Artifacts", "Spell Slinger"], power: 5};
 	let decks6: Deck = {player: "Stamm", commander: "Juri", w:false, u: false, b: true, r: true, g: false, strategy:["Voltron"], power: 5};
@@ -188,7 +214,11 @@ function MatchupGenerator() {
 	let decko4: Deck = {player: "Olivier", commander: "Isperia", w:true, u: true, b: false, r: false, g: false, strategy:["Flyers", "Stompy"], power: 5};
 	let decko5: Deck = {player: "Olivier", commander: "Atarka", w:false, u: false, b: false, r: true, g: true, strategy:["Flyers", "Stompy"], power: 5};
 	let deckm1: Deck = {player: "Mark", commander: "Rafiq", w:true, u: true, b: false, r: false, g: true, strategy:["Voltron"], power: 5};
-	let deckm2: Deck = {player: "Mark", commander: "Kresh", w:false, u: true, b: true, r: true, g: true, strategy:["Voltron", "Plus One Counters"], power: 5};
+	let deckm2: Deck = {player: "Mark", commander: "Kresh", w:false, u: false, b: true, r: true, g: true, strategy:["Voltron", "Plus One Counters"], power: 5};
+	let deckm3: Deck = {player: "Mark", commander: "Irenicus", w:false, u: true, b: true, r: false, g: true, strategy:["Tainted Gifts"], power: 4};
+	let deckm4: Deck = {player: "Mark", commander: "Hannah", w:true, u: true, b: false, r: false, g: false, strategy:["Artifacts", "Artifact Creatures"], power: 6};
+	let deckm5: Deck = {player: "Mark", commander: "Niv Mizzet", w:false, u: true, b: false, r: true, g: false, strategy:["Pingers", "Burn"], power: 4};
+	let deckm6: Deck = {player: "Mark", commander: "Karthus", w:false, u: false, b: true, r: true, g: true, strategy:["Voltron"], power: 5};
 
 	let fullDeckList: Array<Deck> = [
 		decka1,
@@ -198,6 +228,7 @@ function MatchupGenerator() {
 		decka5,
 		decka6,
 		decka7,
+		decka8,
 		deckb1,
 		deckb2,
 		deckb3,
@@ -207,6 +238,7 @@ function MatchupGenerator() {
 		deckb7,
 		deckb8,
 		deckb9,
+		deckb10,
 		decks1,
 		decks2,
 		decks3,
@@ -219,7 +251,11 @@ function MatchupGenerator() {
 		decko4,
 		decko5,
 		deckm1,
-		deckm2	
+		deckm2,
+		deckm3,
+		deckm4,
+		deckm5,
+		deckm6,
 	];
 	
 	// **************** DATA MANIPULATION
@@ -254,7 +290,7 @@ function MatchupGenerator() {
 		
 		updatedSelectedPlayerDeckLists[player][deckIndex].selected = event.target.checked;
 		setSelectedPlayerDeckLists(updatedSelectedPlayerDeckLists);
-		console.log(selectedPlayerDeckLists);
+		//console.log(selectedPlayerDeckLists);
 	}
 
 	/********
@@ -318,7 +354,7 @@ function MatchupGenerator() {
 	
 	const handleSubmit = () => {
 		let players: Array<string> = Object.keys(selectedPlayerDeckLists);
-		console.log(players);
+		//console.log(players);
 		//NEED TO FILTER ONLY SELECTED DECKS
 		let fullLists: Array<Array<Deck>> = Object.values(selectedPlayerDeckLists);
 		let selectedLists: Array<Array<Deck>> = [];
@@ -333,26 +369,21 @@ function MatchupGenerator() {
 			selectedLists.push(selectedList);
 		}
 		
-		console.log(selectedLists);
-		
 		let deckMatchups: Array<Array<Deck>> = [[]];
 		for(var i = 0; i < selectedLists.length; i++){
 			deckMatchups = cartesian(deckMatchups, selectedLists[i]);
 		}
 		
-		console.log(deckMatchups);
-		let updatedMatchups = [...matchups];
-		console.log(matchups);
+		let updatedMatchups = [];
+		
 		for(var i = 0; i < deckMatchups.length; i++){
 			updatedMatchups.push(new Matchup(deckMatchups[i]));
 		}
+		
+		updatedMatchups.sort(compareColorCoverageThenStratsThenPower);
 		setMatchups(updatedMatchups);
 		
 	};
-	
-	const submitText = () => {
-		return "Generate";
-	}
 	
 	/****************
 	*
@@ -373,13 +404,13 @@ function MatchupGenerator() {
 	**/
 	
 	return (
-		<div>
+		<div style={{width:"75%"}}>
 			<ChoosePlayersStep playerPool={playerPool} handlePlayerSelect={handlePlayerSelect}/>
 			<br/><hr/><br/>
 			<ChooseDecksStep selectedPlayerDeckLists={selectedPlayerDeckLists} handleDeckSelect={handleDeckSelect}/>
-			<br/><hr/><br/>
-			<button disabled={submitDisabled()} onClick={handleSubmit} /*style for button*/ >{submitText()}</button>
-			<br/><br />
+			<br/>
+			<button disabled={submitDisabled()} onClick={handleSubmit} /*style for button*/ >Generate</button>
+			<br/><br/><hr/><br/>
 			<MatchupList matchups={matchups}  />
 		</div>
 	);
@@ -406,7 +437,7 @@ function PlayerSelect({playerPool, handlePlayerSelect}){
 				{playerPool.map((player, index) => (
 					<div key={index}>
 						<input value={player} type="checkbox" onChange={handlePlayerSelect}/>
-						<span>{player}</span>
+						<span style={{marginLeft:"5px"}}>{player}</span>
 					</div>
 				))}
 			</div>
@@ -425,11 +456,11 @@ function ChooseDecksStep({selectedPlayerDeckLists, handleDeckSelect}){
 	return (
 		<>
 			<h2>Choose Decks</h2>
-			<ul>
-			{players.map((name, index) => (
-				<DeckSelector key={index} playerName={name} decks={selectedPlayerDeckLists[name]} handleDeckSelect={handleDeckSelect} />
-			))}
-			</ul>
+			<div style={{display:"flex", marginTop:"10px"}}>
+				{players.map((name, index) => (
+					<DeckSelector key={index} playerName={name} decks={selectedPlayerDeckLists[name]} handleDeckSelect={handleDeckSelect} />
+				))}
+			</div>
 		</> 
 	);
 }
@@ -437,15 +468,15 @@ function ChooseDecksStep({selectedPlayerDeckLists, handleDeckSelect}){
 function DeckSelector({playerName, decks, handleDeckSelect}){
 	return (
 	<>
-		<li>
+		<span style={{marginRight: "auto"}}>
 			<h3>{playerName}</h3>
 			{decks.map((deck, index) => (
 				<div key={index}>
 					<input type="checkbox" value={index} pname={playerName} onChange={handleDeckSelect}/>
-					<span>{deck.commander}</span>
+					<span style={{marginLeft:"5px"}}>{deck.commander}</span>
 				</div>
 			))}
-		</li>
+		</span>
 	</>
 	);
 }
@@ -459,8 +490,8 @@ function DeckSelector({playerName, decks, handleDeckSelect}){
 function MatchupList({matchups}){
 	return (
 		<>
-			<h2>Matchups</h2>
-			<div>
+			<h2 style={{display: matchups.length ? "" : "none"}}>Matchups</h2>
+			<div style={{marginTop: "10px"}}>
 				{matchups.map((matchup, index) => (
 					<div key={index}>
 						<MatchupListItem matchup={matchup}/>
@@ -473,8 +504,17 @@ function MatchupList({matchups}){
 
 function MatchupListItem({matchup}){
 	return (
+	<div style={{padding: "10px", border:"1px solid", marginBottom: "10px"}}>
 		<div>
-			<span>{matchup.matchupName}</span>
+			<span><h3><u>{matchup.matchupName}</u></h3></span>
 		</div>
+		<div>
+			<span><b>Color Coverage</b>: {matchup.colorCoverage}</span>
+			<span>&nbsp;</span>
+			<span><b>Strat Overlap</b>: {matchup.strategyOverlap}</span>
+			<span>&nbsp;</span>
+			<span><b>Power variance</b>: {matchup.powerVariance}</span>
+		</div>
+	</div>
 	)
 }
