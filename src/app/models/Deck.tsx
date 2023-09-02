@@ -1,4 +1,5 @@
 interface Deck {
+	_id: string;
 	player: string;
 	commander: string;
 	w: boolean;

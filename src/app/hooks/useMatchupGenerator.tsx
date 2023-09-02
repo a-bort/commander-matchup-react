@@ -2,11 +2,13 @@
 import { useState } from 'react'
 import Deck from '../models/Deck'
 import PlayerIndexedDeckList from '../models/PlayerIndexedDeckList'
+import IMatchup from '../models/IMatchup'
 import calculateVariance from '../utils/calculateVariance'
 import calculateSD from '../utils/calculateSD'
 import commonArrayElements from '../utils/commonArrayElements'
 
-class Matchup {
+//CAN WE MOVE THIS SOMEWHERE??
+class Matchup implements IMatchup {
 	matchupDecks: Array<Deck> = [];
 	matchupName: string = "";
 	w: boolean = false;
@@ -78,11 +80,13 @@ class Matchup {
 const useMatchupGenerator = () => {
 	// ************ STATE ******************
 	const [deckListByPlayer, setDeckListByPlayer] = useState<PlayerIndexedDeckList>({});
-	const [playerPool, setPlayerPool] = useState<Array<String>>([]);
-	const [selectedPlayerDeckLists, setSelectedPlayerDeckLists] = useState<PlayerIndexedDeckList>({}); //key: playerName | value: chosenDecks
+	const [playerPool, setPlayerPool] = useState<Array<string>>([]);
+	const [deckListsByPlayer, setDeckListsByPlayer] = useState<PlayerIndexedDeckList>({}); //key: playerName | value: chosenDecks.
+	const [selectedDecks, setSelectedDecks] = useState<PlayerIndexedDeckList>({})
 	const [matchups, setMatchups] = useState<Array<Matchup>>([]); //List of Matchup objects
 	
 	const initializeData = (fullDeckList: Array<Deck>) => {
+		if(!fullDeckList) return;
 		let updatedDeckListByPlayer: PlayerIndexedDeckList = {};
 		
 		for(var i = 0; i < fullDeckList.length; i++){
@@ -97,43 +101,50 @@ const useMatchupGenerator = () => {
 	}
 	
 	const handlePlayerSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-		var updatedSelectedPlayerDeckLists = {...selectedPlayerDeckLists};
+		var updatedDeckListsByPlayer = {...deckListsByPlayer};
 		if(event.target && event.target.checked){
-			updatedSelectedPlayerDeckLists[event.target.value] = deckListByPlayer[event.target.value];
+			updatedDeckListsByPlayer[event.target.value] = deckListByPlayer[event.target.value];
 		} else {
-			delete updatedSelectedPlayerDeckLists[event.target.value];
+			delete updatedDeckListsByPlayer[event.target.value];
 		}
-		setSelectedPlayerDeckLists(updatedSelectedPlayerDeckLists);
+		setDeckListsByPlayer(updatedDeckListsByPlayer);
 	};
 	
-	const handleDeckSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-		let player = event.target.getAttribute("pname") || "";
-		if(!player){
-			console.log("ERROR: MISSING NAME");
+	const handleDeckSelect = (deck: Deck, event: React.ChangeEvent<HTMLInputElement>) => {
+		let player = deck.player;
+		//console.log(deck);
+		let selected = event.target.checked;
+		//console.log(selected);
+		
+		var updatedSelectedDecks = {...selectedDecks};
+		if(!updatedSelectedDecks[deck.player]){
+			updatedSelectedDecks[deck.player] = [];
 		}
-		let deckIndex : number = +event.target.value;
 		
-		var updatedSelectedPlayerDeckLists = {...selectedPlayerDeckLists};
+		if(selected){
+			updatedSelectedDecks[deck.player].push(deck);
+		} else {
+			for(var i = 0; i < updatedSelectedDecks[deck.player].length; i++){
+				if(updatedSelectedDecks[deck.player][i]._id === deck._id){
+					updatedSelectedDecks[deck.player].splice(i, 1);
+					break;
+				}
+			}
+		}
 		
-		updatedSelectedPlayerDeckLists[player][deckIndex].selected = event.target.checked;
-		setSelectedPlayerDeckLists(updatedSelectedPlayerDeckLists);
-		//console.log(selectedPlayerDeckLists);
+		setSelectedDecks(updatedSelectedDecks);
 	}
 	
 	const readyToGenerate = () => {
-		var players = Object.keys(selectedPlayerDeckLists);
-		if(players.length < 2){ return false; }
+	
+		var selectedPlayers = Object.keys(deckListsByPlayer);
+		if(selectedPlayers.length < 2){ return false; }
+		
+		var chosenDeckPlayers = Object.keys(selectedDecks);
+		if(chosenDeckPlayers.length < selectedPlayers.length){ return false; }
 		else {
-			for (var i = 0; i < players.length; i++){
-				var player = players[i];
-				var found = false;
-				for(var j = 0; j < selectedPlayerDeckLists[player].length; j++){
-					if(selectedPlayerDeckLists[player][j].selected){
-						found = true;
-						break;
-					}
-				}
-				if(!found){
+			for (var i = 0; i < chosenDeckPlayers.length; i++){
+				if(selectedDecks[chosenDeckPlayers[i]].length === 0){
 					return false;
 				}
 			}
@@ -142,21 +153,11 @@ const useMatchupGenerator = () => {
 	}
 	
 	const handleSubmit = () => {
-		let players: Array<string> = Object.keys(selectedPlayerDeckLists);
+		let players: Array<string> = Object.keys(selectedDecks);
 		console.log(players);
 		//NEED TO FILTER ONLY SELECTED DECKS
-		let fullLists: Array<Array<Deck>> = Object.values(selectedPlayerDeckLists);
-		let selectedLists: Array<Array<Deck>> = [];
+		let selectedLists: Array<Array<Deck>> = Object.values(selectedDecks);
 		
-		for(var i = 0; i < fullLists.length; i++){
-			var selectedList = [];
-			for(var j = 0; j < fullLists[i].length; j++){
-				if(fullLists[i][j].selected){
-					selectedList.push(fullLists[i][j]);
-				}
-			}
-			selectedLists.push(selectedList);
-		}
 		console.log(selectedLists);
 		let deckMatchups: Array<Array<Deck>> = [[]];
 		for(var i = 0; i < selectedLists.length; i++){
@@ -171,7 +172,6 @@ const useMatchupGenerator = () => {
 			updatedMatchups.push(new Matchup(deckMatchups[i]));
 		}
 		
-		
 		updatedMatchups.sort(compareColorCoverageThenStratsThenPower);
 		setMatchups(updatedMatchups);
 		
@@ -180,7 +180,7 @@ const useMatchupGenerator = () => {
 	return {
 		deckListByPlayer,
 		playerPool,
-		selectedPlayerDeckLists,
+		deckListsByPlayer,
 		matchups,
 		initializeData,
 		handlePlayerSelect,

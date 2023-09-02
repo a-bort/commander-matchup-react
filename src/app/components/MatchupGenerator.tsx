@@ -1,17 +1,22 @@
-//'use client'
+'use client'
 
 //IMPORTS
-import getFullDeckList from '../data'
 import useMatchupGenerator from '../hooks/useMatchupGenerator'
-import { useEffect } from 'react'
+import Deck from '../models/Deck'
+import PlayerIndexedDeckList from '../models/PlayerIndexedDeckList'
+import IMatchup from '../models/IMatchup'
 
 //COMPONENTS LARGE TO SMALL
 
-function MatchupGenerator() {
+interface MatchupGeneratorProps {
+	data: Array<Deck>
+}
+
+function MatchupGenerator({data}: MatchupGeneratorProps) {
 	const {
 		deckListByPlayer,
 		playerPool,
-		selectedPlayerDeckLists,
+		deckListsByPlayer,
 		matchups,
 		initializeData,
 		handlePlayerSelect,
@@ -20,12 +25,8 @@ function MatchupGenerator() {
 		handleSubmit
 	} = useMatchupGenerator();
 	
-	//USE EFFECT IN THE FUTURE
-	
-	useEffect(() => {
-		let data = getFullDeckList();
-		initializeData(data);
-	}, []);
+	//USE EFFECT IN THE FUTURE?
+	initializeData(data);
 	
 	/**
 	* BASE COMPONENT
@@ -35,7 +36,7 @@ function MatchupGenerator() {
 		<div style={{width:"75%"}}>
 			<ChoosePlayersStep playerPool={playerPool} handlePlayerSelect={handlePlayerSelect}/>
 			<br/><hr/><br/>
-			<ChooseDecksStep selectedPlayerDeckLists={selectedPlayerDeckLists} handleDeckSelect={handleDeckSelect}/>
+			<ChooseDecksStep deckListsByPlayer={deckListsByPlayer} handleDeckSelect={handleDeckSelect}/>
 			<br/>
 			<button disabled={!readyToGenerate()} onClick={handleSubmit} /*style for button*/ >Generate</button>
 			<br/><br/><hr/><br/>
@@ -52,7 +53,12 @@ export default MatchupGenerator;
 *
 ************/
 
-function ChoosePlayersStep({playerPool, handlePlayerSelect}){
+interface ChoosePlayersStepProps {
+	playerPool: Array<string>,
+	handlePlayerSelect: React.ChangeEventHandler<HTMLInputElement>
+}
+
+function ChoosePlayersStep({playerPool, handlePlayerSelect}: ChoosePlayersStepProps){
 	return (
 	<>
 		<h2>Who&apos;s Playing?</h2>
@@ -60,7 +66,12 @@ function ChoosePlayersStep({playerPool, handlePlayerSelect}){
 	</> );
 }
 
-function PlayerSelect({playerPool, handlePlayerSelect}){
+interface PlayerSelectProps {
+	playerPool: Array<string>,
+	handlePlayerSelect: React.ChangeEventHandler<HTMLInputElement>
+}
+
+function PlayerSelect({playerPool, handlePlayerSelect}: PlayerSelectProps){
 	return (
 		<div className="checkList">
 			<div className="list-container">
@@ -81,28 +92,39 @@ function PlayerSelect({playerPool, handlePlayerSelect}){
 *
 *****************/
 
-function ChooseDecksStep({selectedPlayerDeckLists, handleDeckSelect}){
-	let players = Object.keys(selectedPlayerDeckLists);
+interface ChooseDecksStepProps {
+	deckListsByPlayer: PlayerIndexedDeckList,
+	handleDeckSelect: (deck: Deck, event: React.ChangeEvent<HTMLInputElement>) => void
+}
+
+function ChooseDecksStep({deckListsByPlayer, handleDeckSelect}: ChooseDecksStepProps){
+	let players = Object.keys(deckListsByPlayer);
 	return (
 		<>
 			<h2>Choose Decks</h2>
 			<div style={{display:"flex", marginTop:"10px"}}>
-				{players.map((name, index) => (
-					<DeckSelector key={index} playerName={name} decks={selectedPlayerDeckLists[name]} handleDeckSelect={handleDeckSelect} />
+				{players.map((name: string, index: number) => (
+					<DeckSelector key={index} playerName={name} decks={deckListsByPlayer[name]} handleDeckSelect={handleDeckSelect} />
 				))}
 			</div>
 		</> 
 	);
 }
 
-function DeckSelector({playerName, decks, handleDeckSelect}){
+interface DeckSelectorProps {
+	playerName: string,
+	decks: Array<Deck>,
+	handleDeckSelect: (deck: Deck, event: React.ChangeEvent<HTMLInputElement>) => void
+}
+
+function DeckSelector({playerName, decks, handleDeckSelect}: DeckSelectorProps){
 	return (
 	<>
 		<span style={{marginRight: "auto"}}>
 			<h3>{playerName}</h3>
-			{decks.map((deck, index) => (
+			{decks.map((deck: Deck, index: number) => (
 				<div key={index}>
-					<input type="checkbox" value={index} pname={playerName} onChange={handleDeckSelect}/>
+					<input type="checkbox" value={index} onChange={e => handleDeckSelect(deck, e)}/>
 					<span style={{marginLeft:"5px"}}>{deck.commander}</span>
 				</div>
 			))}
@@ -117,12 +139,16 @@ function DeckSelector({playerName, decks, handleDeckSelect}){
 *
 *************************/
 
-function MatchupList({matchups}){
+interface MatchupListProps {
+	matchups: Array<IMatchup>
+}
+
+function MatchupList({matchups}: MatchupListProps){
 	return (
 		<>
 			<h2 style={{display: matchups.length ? "" : "none"}}>Matchups</h2>
 			<div style={{marginTop: "10px"}}>
-				{matchups.map((matchup, index) => (
+				{matchups.map((matchup, index: number) => (
 					<div key={index}>
 						<MatchupListItem matchup={matchup}/>
 					</div>			
@@ -132,7 +158,11 @@ function MatchupList({matchups}){
 	);
 }
 
-function MatchupListItem({matchup}){
+interface MatchupListItemProps {
+	matchup: IMatchup
+}
+
+function MatchupListItem({matchup}: MatchupListItemProps){
 	return (
 	<div style={{padding: "10px", border:"1px solid", marginBottom: "10px"}}>
 		<div>
@@ -150,11 +180,15 @@ function MatchupListItem({matchup}){
 	)
 }
 
-function ManaSet({matchup}){
+interface ManaSetProps {
+	matchup: IMatchup
+}
+
+function ManaSet({matchup}: ManaSetProps){
 	let letters = matchup.colorCoverage.split("");
 	return (
 		<>
-		{letters.map((letter, index) => (
+		{letters.map((letter: string, index: number) => (
 			<ManaSymbol key={index} letter={letter}/>
 		))}
 		</>
@@ -177,7 +211,11 @@ const getManaSymbolImageUrl = (letter: string) : string => {
 	return "var(--colorless-mana-image)";
 }
 
-function ManaSymbol({letter}){
+interface ManaSymbolProps {
+	letter: string;
+}
+
+function ManaSymbol({letter} : ManaSymbolProps){
 	let imageUrl = getManaSymbolImageUrl(letter);
 	
 	return(
