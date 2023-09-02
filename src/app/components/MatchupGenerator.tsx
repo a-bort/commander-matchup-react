@@ -64,7 +64,7 @@ function PlayerSelect({playerPool, handlePlayerSelect}){
 	return (
 		<div className="checkList">
 			<div className="list-container">
-				{playerPool.map((player, index) => (
+				{playerPool.map((player: string, index: number) => (
 					<div key={index}>
 						<input value={player} type="checkbox" onChange={handlePlayerSelect}/>
 						<span style={{marginLeft:"5px"}}>{player}</span>

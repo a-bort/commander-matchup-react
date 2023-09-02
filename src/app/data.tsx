@@ -73,7 +73,7 @@ let fullDeckList: Array<Deck> = [
 	deckm6,
 ];
 
-const getFullDeckList : Array<Deck> = () => {
+const getFullDeckList = () : Array<Deck> => {
 	return fullDeckList;
 }
 

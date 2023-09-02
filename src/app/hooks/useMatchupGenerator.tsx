@@ -1,8 +1,7 @@
 
 import { useState } from 'react'
-import { Deck, PlayerIndexedDeckList } from '../models'
-//import { cartesian, calculateMean, calculateVariance, calculateSD, commonArrayElements } from "../utils"
-import cartesian from '../utils/cartesian'
+import Deck from '../models/Deck'
+import PlayerIndexedDeckList from '../models/PlayerIndexedDeckList'
 import calculateVariance from '../utils/calculateVariance'
 import calculateSD from '../utils/calculateSD'
 import commonArrayElements from '../utils/commonArrayElements'
@@ -81,7 +80,7 @@ const useMatchupGenerator = () => {
 	const [deckListByPlayer, setDeckListByPlayer] = useState<PlayerIndexedDeckList>({});
 	const [playerPool, setPlayerPool] = useState<Array<String>>([]);
 	const [selectedPlayerDeckLists, setSelectedPlayerDeckLists] = useState<PlayerIndexedDeckList>({}); //key: playerName | value: chosenDecks
-	const [matchups, setMatchups] = useState([]); //List of Matchup objects
+	const [matchups, setMatchups] = useState<Array<Matchup>>([]); //List of Matchup objects
 	
 	const initializeData = (fullDeckList: Array<Deck>) => {
 		let updatedDeckListByPlayer: PlayerIndexedDeckList = {};
@@ -166,7 +165,7 @@ const useMatchupGenerator = () => {
 		
 		console.log(deckMatchups);
 		
-		let updatedMatchups = [];
+		let updatedMatchups: Array<Matchup> = [];
 		
 		for(var i = 0; i < deckMatchups.length; i++){
 			updatedMatchups.push(new Matchup(deckMatchups[i]));
@@ -189,6 +188,17 @@ const useMatchupGenerator = () => {
 		readyToGenerate,
 		handleSubmit
 	}
+}
+
+const cartesian = (set_a: Array<Array<Deck>>, set_b: Array<Deck>): Array<Array<Deck>> => {
+	let result: Array<Array<Deck>> = [];
+	for(var i=0; i<set_a.length; i++){
+		for(var j=0; j<set_b.length; j++){
+			let temp: Array<Deck> = set_a[i].concat(set_b[j]);
+			result.push(temp);
+		}
+	}
+	return result;
 }
 
 const compareColorCoverageThenStratsThenPower = (m1: Matchup, m2: Matchup): number => {
