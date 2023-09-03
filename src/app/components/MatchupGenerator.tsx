@@ -8,11 +8,7 @@ import IMatchup from '../models/IMatchup'
 
 //COMPONENTS LARGE TO SMALL
 
-interface MatchupGeneratorProps {
-	data: Array<Deck>
-}
-
-function MatchupGenerator(/*{data}: MatchupGeneratorProps*/) {
+function MatchupGenerator() {
 	const {
 		deckListByPlayer,
 		playerPool,
@@ -29,7 +25,7 @@ function MatchupGenerator(/*{data}: MatchupGeneratorProps*/) {
 	**/
 	
 	return (
-		<div style={{width:"75%"}}>
+		<div style={{minWidth:"65vw"}}>
 			<ChoosePlayersStep playerPool={playerPool} handlePlayerSelect={handlePlayerSelect}/>
 			<br/><hr/><br/>
 			<ChooseDecksStep deckListsByPlayer={deckListsByPlayer} handleDeckSelect={handleDeckSelect}/>
@@ -121,7 +117,9 @@ function DeckSelector({playerName, decks, handleDeckSelect}: DeckSelectorProps){
 			{decks.map((deck: Deck, index: number) => (
 				<div key={index}>
 					<input type="checkbox" value={index} onChange={e => handleDeckSelect(deck, e)}/>
-					<span style={{marginLeft:"5px"}}>{deck.commander}</span>
+					<span style={{marginLeft:"5px"}}>
+						{deck.commander}
+					</span>
 				</div>
 			))}
 		</span>

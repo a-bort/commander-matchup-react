@@ -40,9 +40,7 @@ const useMatchupGenerator = () => {
 	
 	const handleDeckSelect = (deck: Deck, event: React.ChangeEvent<HTMLInputElement>) => {
 		let player = deck.player;
-		//console.log(deck);
 		let selected = event.target.checked;
-		//console.log(selected);
 		
 		var updatedSelectedDecks = {...selectedDecks};
 		if(!updatedSelectedDecks[deck.player]){
@@ -82,17 +80,12 @@ const useMatchupGenerator = () => {
 	
 	const handleSubmit = () => {
 		let players: Array<string> = Object.keys(selectedDecks);
-		console.log(players);
-		//NEED TO FILTER ONLY SELECTED DECKS
 		let selectedLists: Array<Array<Deck>> = Object.values(selectedDecks);
 		
-		console.log(selectedLists);
 		let deckMatchups: Array<Array<Deck>> = [[]];
 		for(var i = 0; i < selectedLists.length; i++){
 			deckMatchups = cartesian(deckMatchups, selectedLists[i]);
 		}
-		
-		console.log(deckMatchups);
 		
 		let updatedMatchups: Array<Matchup> = [];
 		

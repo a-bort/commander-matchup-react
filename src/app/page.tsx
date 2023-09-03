@@ -8,11 +8,9 @@ import MatchupGenerator from './components/MatchupGenerator'
 //BASE COMPONENT
 
 export default function Home() {
-	console.log("Rendering");
-	//let data = getFullDeckList();
 	return (
 		<main className={styles.main}>
-		  <MatchupGenerator /*data={data}*//>
+		  <MatchupGenerator />
 		</main>
 	)
 }
