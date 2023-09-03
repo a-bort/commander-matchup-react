@@ -12,21 +12,17 @@ interface MatchupGeneratorProps {
 	data: Array<Deck>
 }
 
-function MatchupGenerator({data}: MatchupGeneratorProps) {
+function MatchupGenerator(/*{data}: MatchupGeneratorProps*/) {
 	const {
 		deckListByPlayer,
 		playerPool,
 		deckListsByPlayer,
 		matchups,
-		initializeData,
 		handlePlayerSelect,
 		handleDeckSelect,
 		readyToGenerate,
 		handleSubmit
 	} = useMatchupGenerator();
-	
-	//USE EFFECT IN THE FUTURE?
-	initializeData(data);
 	
 	/**
 	* BASE COMPONENT

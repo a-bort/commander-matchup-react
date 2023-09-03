@@ -1,5 +1,6 @@
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import getFullDeckList from '../data'
 import Deck from '../models/Deck'
 import PlayerIndexedDeckList from '../models/PlayerIndexedDeckList'
 import IMatchup from '../models/IMatchup'
@@ -85,8 +86,8 @@ const useMatchupGenerator = () => {
 	const [selectedDecks, setSelectedDecks] = useState<PlayerIndexedDeckList>({})
 	const [matchups, setMatchups] = useState<Array<Matchup>>([]); //List of Matchup objects
 	
-	const initializeData = (fullDeckList: Array<Deck>) => {
-		if(!fullDeckList) return;
+	const initializeData = () => {
+		let fullDeckList = getFullDeckList();
 		let updatedDeckListByPlayer: PlayerIndexedDeckList = {};
 		
 		for(var i = 0; i < fullDeckList.length; i++){
@@ -177,12 +178,15 @@ const useMatchupGenerator = () => {
 		
 	};
 	
+	useEffect(() => {
+		initializeData();
+	}, []);
+	
 	return {
 		deckListByPlayer,
 		playerPool,
 		deckListsByPlayer,
 		matchups,
-		initializeData,
 		handlePlayerSelect,
 		handleDeckSelect,
 		readyToGenerate,
