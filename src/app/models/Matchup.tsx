@@ -1,4 +1,5 @@
-import IMatchup from '../models/IMatchup'
+import IMatchup from './IMatchup'
+import Deck from './Deck'
 import calculateVariance from '../utils/calculateVariance'
 import calculateSD from '../utils/calculateSD'
 import commonArrayElements from '../utils/commonArrayElements'
