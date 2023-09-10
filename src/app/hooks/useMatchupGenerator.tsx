@@ -40,7 +40,7 @@ const useMatchupGenerator = () => {
 	};
 	
 	const handleGamesSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-		let games = event.target.value;
+		let games = +event.target.value;
 		console.log(games);
 		setNumberOfGames(games);
 	};
