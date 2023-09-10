@@ -12,9 +12,11 @@ function MatchupGenerator() {
 	const {
 		deckListByPlayer,
 		playerPool,
+		numberOfGames,
 		deckListsByPlayer,
 		matchups,
 		handlePlayerSelect,
+		handleGamesSelect,
 		handleDeckSelect,
 		readyToGenerate,
 		handleSubmit
@@ -27,6 +29,8 @@ function MatchupGenerator() {
 	return (
 		<div style={{minWidth:"65vw"}}>
 			<ChoosePlayersStep playerPool={playerPool} handlePlayerSelect={handlePlayerSelect}/>
+			<br/><hr/><br/>
+			<ChooseGamesStep numberOfGames={numberOfGames} handleGamesSelect={handleGamesSelect} />
 			<br/><hr/><br/>
 			<ChooseDecksStep deckListsByPlayer={deckListsByPlayer} handleDeckSelect={handleDeckSelect}/>
 			<br/>
@@ -57,6 +61,23 @@ function ChoosePlayersStep({playerPool, handlePlayerSelect}: ChoosePlayersStepPr
 		<PlayerSelect playerPool={playerPool} handlePlayerSelect={handlePlayerSelect} />
 	</> );
 }
+
+//--------------
+
+interface ChooseGamesStepProps {
+	numberOfGames: number,
+	handleGamesSelect: React.ChangeEventHandler<HTMLInputElement>
+}
+
+function ChooseGamesStep({numberOfGames, handleGamesSelect}: ChooseGamesStepProps){
+	return (
+	<>
+		<h3>How many games?</h3>
+		<input type="number" min="1" max="6" value={numberOfGames} onChange={handleGamesSelect}/>
+	</> );
+}
+
+//--------------
 
 interface PlayerSelectProps {
 	playerPool: Array<string>,

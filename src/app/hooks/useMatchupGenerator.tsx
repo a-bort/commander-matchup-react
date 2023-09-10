@@ -9,6 +9,7 @@ const useMatchupGenerator = () => {
 	// ************ STATE ******************
 	const [deckListByPlayer, setDeckListByPlayer] = useState<PlayerIndexedDeckList>({});
 	const [playerPool, setPlayerPool] = useState<Array<string>>([]);
+	const [numberOfGames, setNumberOfGames] = useState<number>(1);
 	const [deckListsByPlayer, setDeckListsByPlayer] = useState<PlayerIndexedDeckList>({}); //key: playerName | value: chosenDecks.
 	const [selectedDecks, setSelectedDecks] = useState<PlayerIndexedDeckList>({})
 	const [matchups, setMatchups] = useState<Array<Matchup>>([]); //List of Matchup objects
@@ -36,6 +37,12 @@ const useMatchupGenerator = () => {
 			delete updatedDeckListsByPlayer[event.target.value];
 		}
 		setDeckListsByPlayer(updatedDeckListsByPlayer);
+	};
+	
+	const handleGamesSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+		let games = event.target.value;
+		console.log(games);
+		setNumberOfGames(games);
 	};
 	
 	const handleDeckSelect = (deck: Deck, event: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,7 +102,7 @@ const useMatchupGenerator = () => {
 		
 		updatedMatchups.sort(compareColorCoverageThenStratsThenPower);
 		setMatchups(updatedMatchups);
-		
+		console.log(updatedMatchups);
 	};
 	
 	useEffect(() => {
@@ -105,9 +112,11 @@ const useMatchupGenerator = () => {
 	return {
 		deckListByPlayer,
 		playerPool,
+		numberOfGames,
 		deckListsByPlayer,
 		matchups,
 		handlePlayerSelect,
+		handleGamesSelect,
 		handleDeckSelect,
 		readyToGenerate,
 		handleSubmit
