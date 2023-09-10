@@ -4,7 +4,6 @@ import calculateVariance from '../utils/calculateVariance'
 import calculateSD from '../utils/calculateSD'
 import commonArrayElements from '../utils/commonArrayElements'
 
-//CAN WE MOVE THIS SOMEWHERE??
 class Matchup implements IMatchup {
 	matchupDecks: Array<Deck> = [];
 	matchupName: string = "";
@@ -16,7 +15,7 @@ class Matchup implements IMatchup {
 	colorCoverage: string = "";
 	powerVariance: number = 0;
 	strategyOverlap: number = 0;
-	
+
 	constructor(decks: Array<Deck>) {
 		this.matchupDecks = decks;
 		this.generateMatchupName();
@@ -24,7 +23,7 @@ class Matchup implements IMatchup {
 		this.generatePowerVariance();
 		this.generateStrategyOverlap();
 	}
-	
+
 	generateMatchupName() {
 		if(this.matchupDecks.length == 0){return;}
 		var name = this.matchupDecks[0].commander;
@@ -33,7 +32,7 @@ class Matchup implements IMatchup {
 		}
 		this.matchupName = name;
 	}
-	
+
 	generateColorCoverage() {
 		let w: boolean = false;
 		let u: boolean = false;
@@ -54,7 +53,7 @@ class Matchup implements IMatchup {
 		this.g = g;
 		this.colorCoverage = (w ? "W" : "").concat(u ? "U" : "", b ? "B" : "", r ? "R" : "", g ? "G" : "");
 	}
-	
+
 	generatePowerVariance() {
 		let powers: Array<number> = [];
 		for(var i = 0; i < this.matchupDecks.length; i++){
@@ -62,7 +61,7 @@ class Matchup implements IMatchup {
 		}
 		this.powerVariance = +calculateSD(calculateVariance(powers)).toFixed(2);
 	}
-	
+
 	generateStrategyOverlap() {
 		let overlap: number = 0;
 		for(var i = 0; i < this.matchupDecks.length - 1; i++){

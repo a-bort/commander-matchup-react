@@ -5,6 +5,7 @@ import useMatchupGenerator from '../hooks/useMatchupGenerator'
 import Deck from '../models/Deck'
 import PlayerIndexedDeckList from '../models/PlayerIndexedDeckList'
 import IMatchup from '../models/IMatchup'
+import IGameSet from '../models/IGameSet'
 
 //COMPONENTS LARGE TO SMALL
 
@@ -19,24 +20,26 @@ function MatchupGenerator() {
 		handleGamesSelect,
 		handleDeckSelect,
 		readyToGenerate,
-		handleSubmit
+		handleSubmit,
+		validGameSets
 	} = useMatchupGenerator();
-	
+
 	/**
 	* BASE COMPONENT
 	**/
-	
+
 	return (
 		<div style={{minWidth:"65vw"}}>
 			<ChoosePlayersStep playerPool={playerPool} handlePlayerSelect={handlePlayerSelect}/>
 			<br/><hr/><br/>
 			<ChooseGamesStep numberOfGames={numberOfGames} handleGamesSelect={handleGamesSelect} />
-			<br/><hr/><br/>
+			<br/><br/><hr/><br/>
 			<ChooseDecksStep deckListsByPlayer={deckListsByPlayer} handleDeckSelect={handleDeckSelect}/>
 			<br/>
 			<button disabled={!readyToGenerate()} onClick={handleSubmit} /*style for button*/ >Generate</button>
 			<br/><br/><hr/><br/>
-			<MatchupList matchups={matchups}  />
+			<MatchupSection numberOfGames={numberOfGames} matchups={matchups}  />
+			<GameSetSection numberOfGames={numberOfGames} gameSets={validGameSets} />
 		</div>
 	);
 };
@@ -120,7 +123,7 @@ function ChooseDecksStep({deckListsByPlayer, handleDeckSelect}: ChooseDecksStepP
 					<DeckSelector key={index} playerName={name} decks={deckListsByPlayer[name]} handleDeckSelect={handleDeckSelect} />
 				))}
 			</div>
-		</> 
+		</>
 	);
 }
 
@@ -154,19 +157,34 @@ function DeckSelector({playerName, decks, handleDeckSelect}: DeckSelectorProps){
 *
 *************************/
 
+interface MatchupSectionProps {
+	numberOfGames: number,
+	matchups: Array<IMatchup>
+}
+
 interface MatchupListProps {
 	matchups: Array<IMatchup>
+}
+
+function MatchupSection({numberOfGames, matchups}: MatchupSectionProps){
+	return (
+		<>
+			<div style={{display: numberOfGames === 1 ? "" : "none"}}>
+				<h2 style={{display: matchups.length ? "" : "none"}}>Matchups</h2>
+				<MatchupList matchups={matchups} />
+			</div>
+		</>
+	);
 }
 
 function MatchupList({matchups}: MatchupListProps){
 	return (
 		<>
-			<h2 style={{display: matchups.length ? "" : "none"}}>Matchups</h2>
 			<div style={{marginTop: "10px"}}>
 				{matchups.map((matchup, index: number) => (
 					<div key={index}>
 						<MatchupListItem matchup={matchup}/>
-					</div>			
+					</div>
 				))}
 			</div>
 		</>
@@ -189,7 +207,7 @@ function MatchupListItem({matchup}: MatchupListItemProps){
 			<span>&nbsp;</span>
 			<span><b>Strat Overlap</b>: {matchup.strategyOverlap}</span>
 			<span>&nbsp;</span>
-			<span><b>Power variance</b>: {matchup.powerVariance}</span>
+			<span><b>Power Variance</b>: {matchup.powerVariance}</span>
 		</div>
 	</div>
 	)
@@ -232,7 +250,7 @@ interface ManaSymbolProps {
 
 function ManaSymbol({letter} : ManaSymbolProps){
 	let imageUrl = getManaSymbolImageUrl(letter);
-	
+
 	return(
 		<>
 		<div style={{backgroundImage:imageUrl, width:"var(--mana-symbol-width)", height:"var(--mana-symbol-height)", display: "inline-block", margin: "1px, 1px, -1px, 1px", borderRadius: "500px", boxShadow: "-1px, 1px, 0, rgba(0,0,0,0.85)", textIndent: "-999em", overflow:"hidden", backgroundSize: "100% 100%", backgroundPosition: "top left"}}>
@@ -240,4 +258,35 @@ function ManaSymbol({letter} : ManaSymbolProps){
 		</div>
 		</>
 	)
+}
+
+/************************
+*
+* RENDER gamesets
+*
+*************************/
+
+interface GameSetsProps {
+	numberOfGames: number;
+	gameSets: Array<IGameSet>;
+}
+
+function GameSetSection({numberOfGames, gameSets}: GameSetsProps){
+	return (
+		<>
+			<div style={{display: numberOfGames > 1 ? "" : "none"}}>
+				<h2 style={{display: gameSets.length ? "" : "none"}}>Sets of Games</h2>
+				<div style={{marginTop: "10px"}}>
+					{gameSets.map((gameSet, index: number) => (
+						<div key={index} style={{borderLeft: "1px solid", paddingLeft: "5px"}}>
+							<div>
+								<b>Set #{index + 1}</b>&nbsp;|&nbsp;Total Coverage: {Number(gameSet.totalCoverage).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:0})}&nbsp;|&nbsp;Total Variance: {gameSet.totalVariance}&nbsp;|&nbsp;Total Overlap: {gameSet.totalOverlap}
+							</div>
+							<MatchupList matchups={gameSet.matchups} />
+						</div>
+					))}
+				</div>
+			</div>
+		</>
+	);
 }
