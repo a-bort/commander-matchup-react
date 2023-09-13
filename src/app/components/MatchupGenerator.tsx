@@ -278,9 +278,9 @@ function GameSetSection({numberOfGames, gameSets}: GameSetsProps){
 				<h2 style={{display: gameSets.length ? "" : "none"}}>Sets of Games</h2>
 				<div style={{marginTop: "10px"}}>
 					{gameSets.map((gameSet, index: number) => (
-						<div key={index} style={{borderLeft: "1px solid", paddingLeft: "5px"}}>
+						<div key={index} style={{borderLeft: "1px solid", paddingLeft: "5px", marginTop: "25px", backgroundColor: ""}}>
 							<div>
-								<b>Set #{index + 1}</b>&nbsp;|&nbsp;Total Coverage: {Number(gameSet.totalCoverage).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:0})}&nbsp;|&nbsp;Total Variance: {gameSet.totalVariance}&nbsp;|&nbsp;Total Overlap: {gameSet.totalOverlap}
+								<b>Set #{index + 1}</b>&nbsp;|&nbsp;Coverage: {Number(gameSet.totalCoverage).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:0})}&nbsp;|&nbsp;Variance: {gameSet.totalVariance}&nbsp;|&nbsp;Overlap: {gameSet.totalOverlap}
 							</div>
 							<MatchupList matchups={gameSet.matchups} />
 						</div>
