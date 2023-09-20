@@ -62,7 +62,7 @@ class Matchup implements IMatchup {
 		for(var i = 0; i < this.matchupDecks.length; i++){
 			powers.push(this.matchupDecks[i].power);
 		}
-		this.powerAverage = calculateMean(powers).toFixed(2);
+		this.powerAverage = +calculateMean(powers).toFixed(2);
 	}
 
 	generatePowerVariance() {

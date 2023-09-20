@@ -10,6 +10,7 @@ interface IMatchup {
 	g: boolean;
 	colorCoverage: string;
 	powerVariance: number;
+	powerAverage: number;
 	strategyOverlap: number;
 }
 

@@ -5,6 +5,7 @@ interface IGameSet {
 	totalCoverage: number; //PERCENT
 	totalVariance: number;
 	totalOverlap: number;
+	powerAverage: number;
 }
 
 export default IGameSet;

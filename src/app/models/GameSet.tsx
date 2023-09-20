@@ -50,7 +50,7 @@ class GameSet implements IGameSet {
     for(var i = 0; i < this.matchups.length; i++){
       variance += this.matchups[i].powerVariance;
     }
-    this.totalVariance = variance;
+    this.totalVariance = +variance.toFixed(2);
   }
 
   generateTotalOverlap(){
@@ -66,7 +66,7 @@ class GameSet implements IGameSet {
 		for(var i = 0; i < this.matchups.length; i++){
 			powers.push(+this.matchups[i].powerAverage);
 		}
-		this.powerAverage = calculateMean(powers).toFixed(2);
+		this.powerAverage = +calculateMean(powers).toFixed(2);
   }
 }
 
