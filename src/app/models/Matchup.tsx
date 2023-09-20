@@ -1,5 +1,6 @@
 import IMatchup from './IMatchup'
 import Deck from './Deck'
+import calculateMean from '../utils/calculateMean'
 import calculateVariance from '../utils/calculateVariance'
 import calculateSD from '../utils/calculateSD'
 import commonArrayElements from '../utils/commonArrayElements'
@@ -13,6 +14,7 @@ class Matchup implements IMatchup {
 	r: boolean = false;
 	g: boolean = false;
 	colorCoverage: string = "";
+	powerAverage: number = 0;
 	powerVariance: number = 0;
 	strategyOverlap: number = 0;
 
@@ -21,6 +23,7 @@ class Matchup implements IMatchup {
 		this.generateMatchupName();
 		this.generateColorCoverage();
 		this.generatePowerVariance();
+		this.generatePowerAverage();
 		this.generateStrategyOverlap();
 	}
 
@@ -52,6 +55,14 @@ class Matchup implements IMatchup {
 		this.r = r;
 		this.g = g;
 		this.colorCoverage = (w ? "W" : "").concat(u ? "U" : "", b ? "B" : "", r ? "R" : "", g ? "G" : "");
+	}
+
+	generatePowerAverage() {
+		let powers: Array<number> = [];
+		for(var i = 0; i < this.matchupDecks.length; i++){
+			powers.push(this.matchupDecks[i].power);
+		}
+		this.powerAverage = calculateMean(powers).toFixed(2);
 	}
 
 	generatePowerVariance() {

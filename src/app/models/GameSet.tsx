@@ -1,5 +1,6 @@
 import IGameSet from './IGameSet'
 import Matchup from './Matchup'
+import calculateMean from '../utils/calculateMean'
 
 const sha1 = require('sha-1');
 
@@ -9,6 +10,7 @@ class GameSet implements IGameSet {
   totalCoverage: number = 0; //PERCENT
 	totalVariance: number = 0;
 	totalOverlap: number = 0;
+  powerAverage: number = 0;
 
 	constructor(matchups: Array<Matchup>) {
 		this.matchups = matchups;
@@ -17,6 +19,7 @@ class GameSet implements IGameSet {
     this.generateTotalCoverage();
     this.generateTotalVariance();
     this.generateTotalOverlap();
+    this.generatePowerAverage();
 	}
 
   generateHash(){
@@ -56,6 +59,14 @@ class GameSet implements IGameSet {
       overlap += this.matchups[i].strategyOverlap;
     }
     this.totalOverlap = overlap;
+  }
+
+  generatePowerAverage(){
+    let powers: Array<number> = [];
+		for(var i = 0; i < this.matchups.length; i++){
+			powers.push(+this.matchups[i].powerAverage);
+		}
+		this.powerAverage = calculateMean(powers).toFixed(2);
   }
 }
 

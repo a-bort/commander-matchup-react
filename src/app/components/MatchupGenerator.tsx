@@ -207,7 +207,9 @@ function MatchupListItem({matchup}: MatchupListItemProps){
 			<span>&nbsp;</span>
 			<span><b>Strat Overlap</b>: {matchup.strategyOverlap}</span>
 			<span>&nbsp;</span>
-			<span><b>Power Variance</b>: {matchup.powerVariance}</span>
+			<span><b>Power Var.</b>: {matchup.powerVariance}</span>
+			<span>&nbsp;</span>
+			<span><b>Power Avg.</b>: {matchup.powerAverage}</span>
 		</div>
 	</div>
 	)
@@ -280,7 +282,7 @@ function GameSetSection({numberOfGames, gameSets}: GameSetsProps){
 					{gameSets.map((gameSet, index: number) => (
 						<div key={index} style={{borderLeft: "1px solid", paddingLeft: "5px", marginTop: "25px", backgroundColor: ""}}>
 							<div>
-								<b>Set #{index + 1}</b>&nbsp;|&nbsp;Coverage: {Number(gameSet.totalCoverage).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:0})}&nbsp;|&nbsp;Variance: {gameSet.totalVariance}&nbsp;|&nbsp;Overlap: {gameSet.totalOverlap}
+								<b>Set #{index + 1}</b>&nbsp;|&nbsp;Coverage: {Number(gameSet.totalCoverage).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:0})}&nbsp;|&nbsp;Variance: {gameSet.totalVariance}&nbsp;|&nbsp;Overlap: {gameSet.totalOverlap}&nbsp;|&nbsp;Power: {gameSet.powerAverage}
 							</div>
 							<MatchupList matchups={gameSet.matchups} />
 						</div>
