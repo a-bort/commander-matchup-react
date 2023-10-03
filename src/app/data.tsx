@@ -3,7 +3,7 @@ import Deck from './models/Deck'
 
 let fullDeckList: Array<Deck> = [
 	{_id:"", player: "Andrew", commander: "Bahamut", w:true, u: false, b: false, r: false, g: false, strategy:["Initiative", "Tokens", "Superfriends"], power: 5},
-	{_id:"", player: "Andrew", commander: "Sidar & Ikra", w:true, u: false, b: true, r: false, g: true, strategy:["Lifegain"], power: 7},
+	{_id:"", player: "Andrew", commander: "Ikra & Co.", w:true, u: false, b: true, r: false, g: true, strategy:["Lifegain", "Toughness", "Tokens"], power: 7},
 	{_id:"", player: "Andrew", commander: "Chromium", w:true, u: true, b: true, r: false, g: false, strategy:["Control", "Self Discard"], power: 5},
 	{_id:"", player: "Andrew", commander: "Slimefoot", w:false, u: false, b: true, r: false, g: true, strategy:["Gain & Drain", "Tokens", "Aristocrats"], power: 4},
 	{_id:"", player: "Andrew", commander: "Narset", w:true, u: true, b: false, r: true, g: false, strategy:["Tokens", "Go Wide", "Reanimator"], power: 7},
@@ -23,6 +23,7 @@ let fullDeckList: Array<Deck> = [
 	{_id:"", player: "Brian", commander: "Lucea", w:false, u: true, b: false, r: true, g: true, strategy:["Plus One Counters", "Stompy", "Ramp"], power: 7},
 	{_id:"", player: "Brian", commander: "Firja", w:true, u: false, b: true, r: false, g: false, strategy:["Lifegain", "Flyers"], power: 4},
 	{_id:"", player: "Brian", commander: "Alela", w:false, u: true, b: true, r: false, g: false, strategy:["Faeries", "Flyers", "Draw Go", "Spell Slinger"], power: 5},
+	{_id:"", player: "Brian", commander: "Myrkul", w:true, u: false, b: true, r: false, g: true, strategy:["Enchantments", "Sacrifice"], power: 7},
 	{_id:"", player: "Stamm", commander: "Mazzy", w:true, u: false, b: false, r: true, g: true, strategy:["Enchantress"], power: 7},
 	{_id:"", player: "Stamm", commander: "Alexi", w:false, u: true, b: false, r: false, g: false, strategy:["Control"], power: 4},
 	{_id:"", player: "Stamm", commander: "Koll", w:true, u: false, b: false, r: true, g: false, strategy:["Equipment"], power: 5},
@@ -40,6 +41,7 @@ let fullDeckList: Array<Deck> = [
 	{_id:"", player: "Olivier", commander: "Emmara", w:true, u: false, b: false, r: false, g: true, strategy:["Tokens", "Lifegain"], power: 5},
 	{_id:"", player: "Olivier", commander: "Henzie", w:false, u: false, b: true, r: true, g: true, strategy:["Blitz", "Stompy"], power: 5},
 	{_id:"", player: "Olivier", commander: "Xander", w:false, u: true, b: true, r: true, g: false, strategy:["Spell Slinger"], power: 5},
+	{_id:"", player: "Olivier", commander: "Kitt Kanto", w:true, u: false, b: false, r: true, g: true, strategy:["Goad", "Tokens"], power: 5},
 	{_id:"", player: "Mark", commander: "Rafiq", w:true, u: true, b: false, r: false, g: true, strategy:["Voltron"], power: 5},
 	{_id:"", player: "Mark", commander: "Kresh", w:false, u: false, b: true, r: true, g: true, strategy:["Voltron", "Plus One Counters"], power: 5},
 	{_id:"", player: "Mark", commander: "Irenicus", w:false, u: true, b: true, r: false, g: true, strategy:["Tainted Gifts"], power: 4},
@@ -48,6 +50,7 @@ let fullDeckList: Array<Deck> = [
 	{_id:"", player: "Mark", commander: "Karthus", w:false, u: false, b: true, r: true, g: true, strategy:["Voltron"], power: 5},
 	{_id:"", player: "Mark", commander: "Obzedadt", w:true, u: false, b: true, r: false, g: false, strategy:["Drain & Gain"], power: 5},
 	{_id:"", player: "Mark", commander: "Knights & Dragons", w:true, u: false, b: false, r: true, g: false, strategy:["Stompy", "Flyers"], power: 4},
+	{_id:"", player: "Mark", commander: "Jared", w:true, u: false, b: false, r: true, g: true, strategy:["Monarch", "Damage Redirection"], power: 5},
 	{_id:"", player: "Daren", commander: "Reaper King", w:true, u: true, b: true, r: true, g: true, strategy:["Good Stuff"], power: 5},
 	{_id:"", player: "Daren", commander: "Seton", w:false, u: false, b: false, r: false, g: true, strategy:["Ramp"], power: 4},
 	{_id:"", player: "Daren", commander: "Jhoira", w:false, u: true, b: false, r: true, g: false, strategy:["Chaos"], power: 5},
